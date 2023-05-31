@@ -1,0 +1,52 @@
+{
+  "name": "@cocreate/authorize",
+  "version": "1.0.0",
+  "description": "A simple authorize component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API.",
+  "keywords": [
+    "authorize",
+    "cocreate",
+    "low-code-framework",
+    "no-code-framework",
+    "cocreatejs",
+    "cocreatejs-component",
+    "cocreate-framework",
+    "no-code",
+    "low-code",
+    "collaborative-framework",
+    "realtime",
+    "realtime-framework",
+    "collaboration",
+    "shared-editing",
+    "html5-framework",
+    "javascript-framework"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "start": "npx webpack --config webpack.config.js",
+    "build": "NODE_ENV=production npx webpack --config webpack.config.js",
+    "dev": "npx webpack --config webpack.config.js --watch",
+    "docs": "node ./node_modules/@cocreate/docs/src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoCreate-app/CoCreate-authorize.git"
+  },
+  "author": "CoCreate LLC",
+  "license": "SSPL-1.0",
+  "bugs": {
+    "url": "https://github.com/CoCreate-app/CoCreate-authorize/issues"
+  },
+  "homepage": "https://cocreate.app/docs/authorize",
+  "funding": {
+    "type": "GitHub Sponsors ❤",
+    "url": "https://github.com/sponsors/CoCreate-app"
+  },
+  "main": "./src/index.js",
+  "devDependencies": {},
+  "dependencies": {
+    "@cocreate/crud-client": "^1.21.5",
+    "@cocreate/docs": "^1.7.13"
+  }
+}
