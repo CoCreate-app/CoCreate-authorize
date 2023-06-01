@@ -1,0 +1,372 @@
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(["@cocreate/crud-client"], function (crud) {
+            return factory(true, crud)
+        });
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = class CoCreateAuthorize {
+            constructor(crud) {
+                return factory(false, crud);
+            }
+        }
+    } else {
+        root.returnExports = factory(true, root["@cocreate/crud-client"]);
+    }
+}(typeof self !== 'undefined' ? self : this, function (isBrowser, crud) {
+
+    const permissions = new Map()
+
+    if (isBrowser) {
+        crud.listen('updateDocument', function (data) {
+            updatePermission(data)
+        });
+
+        crud.listen('deleteDocument', function (data) {
+            deletePermission(data)
+        });
+    } else {
+        process.on('changed-document', async (data) => {
+            updatePermission(data)
+        })
+    }
+
+    async function updatePermission(data) {
+        const { collection, document, organization_id } = data
+
+        if (collection === 'keys' && document) {
+            let permission = document[0]
+            if (permission && permission.key && hasPermission(permission.key)) {
+                let newPermission = await readPermisson(permission.key, organization_id)
+                setPermission(permission.key, newPermission)
+            }
+        }
+    }
+
+    function setPermission(key, permission) {
+        permissions.set(key, permission)
+    }
+
+    function hasPermission(key) {
+        return permissions.has(key)
+    }
+
+    async function getPermission(key, organization_id) {
+        if (permissions.get(key)) {
+            return permissions.get(key)
+        } else {
+            let permission = await readPermisson(key, organization_id);
+            permissions.set(key, permission)
+            return permission
+        }
+    }
+
+    async function readPermisson(key, organization_id) {
+        try {
+            if (!organization_id)
+                return null;
+
+            let request = {
+                collection: 'keys',
+                organization_id,
+                filter: {
+                    query: []
+                }
+            }
+
+            if (key)
+                request.filter.query.push({ name: 'key', value: key, operator: '$eq' })
+            else
+                request.filter.query.push({ name: 'default', value: true, operator: '$eq' })
+
+
+            let permission = await crud.readDocument(request)
+            if (permission && permission.document && permission.document[0]) {
+                permission = permission.document[0]
+
+                if (!permission.collections) {
+                    permission.collections = {};
+                }
+
+                if (permission && permission.roles) {
+                    const role_ids = []
+                    permission.roles.forEach((_id) => {
+                        if (_id)
+                            role_ids.push({ _id })
+                    })
+
+                    delete request.filter
+                    delete request.request
+                    request.document = role_ids
+
+                    let roles = await crud.readDocument(request)
+                    roles = roles.document
+
+                    permission = createPermissionObject(permission, roles)
+                }
+
+            }
+
+            return permission;
+
+        } catch (error) {
+            console.log("Permission Error", error)
+            return null;
+        }
+
+    }
+
+    async function createPermissionObject(permission, roles) {
+        roles.map(role => {
+            for (const roleKey in role) {
+                if (!["_id", "type", "name", "organization_id"].includes(roleKey)) {
+                    if (!permission[roleKey]) {
+                        permission[roleKey] = role[roleKey]
+                    } else {
+                        if (Array.isArray(role[roleKey])) {
+                            for (let item of role[roleKey]) {
+                                if (!permission[roleKey].includes(item))
+                                    permission[roleKey].push(item)
+                            }
+                        }
+                        else if (typeof role[roleKey] == 'object') {
+                            for (const c of Object.keys(role[roleKey])) {
+                                if (!permission[roleKey][c]) {
+                                    permission[roleKey][c] = role[roleKey][c]
+                                } else {
+                                    if (typeof role[roleKey][c] == 'object') {
+                                        permission[roleKey][c] = { ...permission[roleKey][c], ...role[roleKey][c] }
+                                    } else {
+                                        permission[roleKey][c] = role[roleKey][c]
+                                    }
+                                }
+                            }
+                        } else {
+                            permission[roleKey] = role[roleKey]
+                        }
+                    }
+                }
+            }
+        })
+        return permission;
+    }
+
+    async function check(action, data, user_id) {
+        let permission = false
+        if (user_id) {
+            permission = await checkPermissionObject({
+                key: user_id,
+                action,
+                data
+            })
+        }
+        if (!permission || permission.error) {
+            permission = await checkPermissionObject({
+                key: data.key,
+                action,
+                data
+            })
+        }
+        return permission;
+    }
+
+    async function checkPermissionObject({ key, action, data }) {
+        let { organization_id, filter, endPoint } = data
+        if (!key || !organization_id) return false;
+
+        let permission = await getPermission(key, organization_id)
+        if (!permission || permission.error)
+            return permission
+        if (permission.organization_id !== organization_id)
+            return false;
+        if (permission.hosts && permission.hosts.length) {
+            if (!permission.hosts || (!permission.hosts.includes(data.host) && !permission.hosts.includes("*")))
+                return false;
+
+        }
+        if (permission.admin == 'true' || permission.admin === true)
+            return true;
+
+        // if (data.request) {
+        //     let type = action.match(/[A-Z][a-z]+/g);
+        //     type = type[0].toLowerCase()
+        //     data[type] = data.request
+        // }
+
+        let status = await checkAction(permission.actions, action, endPoint, data, filter)
+
+        if (!status)
+            return false
+
+        return { authorized: data };
+    }
+
+    async function checkAction(permissions, action, endPoint, data) {
+        if (!permissions || !action || !permissions[action] || permissions[action] == 'false') return false;
+        if (permissions[action] === true || permissions[action] == 'true' || permissions[action] == '*') return true;
+
+        let authorized = permissions[action].authorize
+        if (authorized) {
+            let status = await checkAthorized(authorized, action, endPoint, data)
+            if (!status)
+                return false
+            else {
+                let unauthorized = permissions[action].unauthorize
+                if (unauthorized) {
+                    let status = await checkAthorized(unauthorized, action, endPoint, data, true)
+                    if (status)
+                        return false
+                }
+                return true
+            }
+        } else
+            return false
+    }
+
+    async function checkAthorized(authorized, action, endPoint, data, unauthorize) {
+        if (!Array.isArray(authorized))
+            authorized = [authorized]
+
+        let status = false
+        for (let i = 0; i < authorized.length; i++) {
+            // if authorized[i] is a booleaan
+            if (authorized[i] === true)
+                return true
+
+            // if authorized[i] is a string or an array
+            if (typeof authorized[i] === "string" || Array.isArray(authorized[i])) {
+                if (authorized[i].includes(true) || authorized[i].includes('true') || authorized[i].includes('*'))
+                    return true
+                else if (endPoint)
+                    return authorized.includes(endPoint)
+                else
+                    return false
+            }
+
+            // if authorized[i] is an object
+            for (const key of Object.keys(authorized[i])) {
+                status = await checkAthorizedKey(authorized[i], action, endPoint, data, key, unauthorize)
+            }
+
+        }
+
+        return status
+
+    }
+
+    async function checkAthorizedKey(authorized, action, endPoint, data, key, unauthorize) {
+        let status = false;
+        let keyStatus = false;
+
+        // if authorized[key] is a booleaan
+        if (authorized[key] === true)
+            keyStatus = true
+
+        // if authorized[key] is a string or number
+        else if (typeof authorized[key] === "string" || typeof authorized[key] === "number") {
+            if (authorized[key] === true || authorized[key] === 'true' || authorized[key] === '*')
+                keyStatus = true
+            else if (data[key]) {
+                keyStatus = await checkArray(authorized, data, key, unauthorize)
+                if (await checkFilter(authorized, data, key, unauthorize))
+                    status = true
+            }
+        }
+
+        // if authorized[key] is an array
+        else if (Array.isArray(authorized[key])) {
+            if (authorized[key].includes(true) || authorized[key].includes('true') || authorized[key].includes('*'))
+                keyStatus = true
+            else if (data[key]) {
+                keyStatus = await checkArray(authorized, data, key, unauthorize)
+                if (await checkFilter(authorized, data, key, unauthorize))
+                    status = true
+            }
+        }
+
+        // if authorized[key] is an object
+        else if (typeof authorized[key] === "object") {
+            console.log('authorized[key] is an object', authorized[key])
+        } else
+            delete data[key]
+
+        // if key status is true for unauthorized case
+        if (!keyStatus || keyStatus && unauthorize) {
+            if (!data.unauthorized || !data.unauthorized[action])
+                data.unauthorized = { [action]: { [key]: [data[key]] } }
+            else if (!data.unauthorized[action][key])
+                data.unauthorized[action][key] = [data[key]]
+            else
+                data.unauthorized[action][key].push(data[key])
+        } else
+            status = true
+        return status
+    }
+
+    async function checkArray(authorized, data, key, unauthorize) {
+        let keyStatus = false
+        let authorizedValue = eval('authorized.' + key)
+        let dataValue = eval('data.' + key)
+
+        if (!authorizedValue && !unauthorize) {
+            if (key.endsWith(']')) {
+                let lastIndex = key.lastIndexOf('[')
+                let index = key.slice(lastIndex + 1).slice(0, -1)
+                let nkey = key.slice(0, key.length - (index.length + 2))
+                console.log(index, nkey);
+                eval(`data.${nkey}.splice(${index}, 1)`)
+            } else
+                eval(`delete data.${key}`)
+        } else if (typeof dataValue == "string") {
+            if (unauthorize && authorizedValue.includes(dataValue))
+                eval(`delete data.${key}`)
+            else {
+                if (!authorizedValue.includes(dataValue))
+                    eval(`delete data.${key}`)
+                else
+                    keyStatus = true
+            }
+
+        } else if (Array.isArray(dataValue)) {
+            for (let i = 0; i < dataValue.length; i++) {
+                let nkey = key + `[${i}]`
+                keyStatus = await checkArray(authorized, data, nkey, unauthorize)
+            }
+        } else if (typeof dataValue === "object") {
+            if (authorizedValue['*'] || authorizedValue['*'] == '') {
+                keyStatus = true
+            } else
+                for (const k of Object.keys(dataValue)) {
+                    let nkey = `${key}.${k}`
+                    keyStatus = await checkArray(authorized, data, nkey, unauthorize)
+                }
+        }
+        return keyStatus
+    }
+
+    async function checkFilter(authorized, data, key, unauthorize) {
+        if (data.filter && data.filter.query) {
+            let name
+            if (data.filter.type == 'document')
+                name = '_id'
+            else if (data.filter.type == 'collection')
+                name = 'name'
+            if (name) {
+                for (let value of authorized[key]) {
+                    if (value[name])
+                        value = value[name]
+                    if (unauthorize)
+                        data.filter.query.push({ name, value, operator: '$ne', logicalOperator: 'or' })
+                    else
+                        data.filter.query.push({ name, value, operator: '$eq', logicalOperator: 'or' })
+                }
+                if (!unauthorize)
+                    return true
+            }
+        }
+    }
+
+    return {
+        check
+    }
+
+}));
