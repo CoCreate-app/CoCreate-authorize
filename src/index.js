@@ -1,18 +1,19 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(["@cocreate/crud-client"], function (crud) {
-            return factory(true, crud)
+        define(["@cocreate/crud-client", "@cocreate/utils"], function (crud, { getValueFromObject, dotNotationToObject }) {
+            return factory(true, crud, { getValueFromObject, dotNotationToObject })
         });
     } else if (typeof module === 'object' && module.exports) {
+        const { getValueFromObject, dotNotationToObject } = require("@cocreate/utils");
         module.exports = class CoCreateAuthorize {
             constructor(crud) {
-                return factory(false, crud);
+                return factory(false, crud, { getValueFromObject, dotNotationToObject });
             }
         }
     } else {
-        root.returnExports = factory(true, root["@cocreate/crud-client"]);
+        root.returnExports = factory(true, root["@cocreate/crud-client"], root["@cocreate/utils"]);
     }
-}(typeof self !== 'undefined' ? self : this, function (isBrowser, crud) {
+}(typeof self !== 'undefined' ? self : this, function (isBrowser, crud, { getValueFromObject, dotNotationToObject }) {
 
     const permissions = new Map()
 
@@ -38,6 +39,17 @@
             if (permission && permission.key && hasPermission(permission.key)) {
                 let newPermission = await readPermisson(permission.key, organization_id)
                 setPermission(permission.key, newPermission)
+            }
+        }
+    }
+
+    async function deletePermission(data) {
+        const { collection, document, organization_id } = data
+
+        if (collection === 'keys' && document) {
+            let permission = document[0]
+            if (permission && permission.key && hasPermission(permission.key)) {
+                permissions.delete(permission.key)
             }
         }
     }
@@ -186,12 +198,6 @@
         if (permission.admin == 'true' || permission.admin === true)
             return true;
 
-        // if (data.request) {
-        //     let type = action.match(/[A-Z][a-z]+/g);
-        //     type = type[0].toLowerCase()
-        //     data[type] = data.request
-        // }
-
         let status = await checkAction(permission.actions, action, endPoint, data, filter)
 
         if (!status)
@@ -289,7 +295,7 @@
         } else
             delete data[key]
 
-        // if key status is true for unauthorized case
+        // if key status is false for unauthorized case
         if (!keyStatus || keyStatus && unauthorize) {
             if (!data.unauthorized || !data.unauthorized[action])
                 data.unauthorized = { [action]: { [key]: [data[key]] } }
@@ -304,42 +310,40 @@
 
     async function checkArray(authorized, data, key, unauthorize) {
         let keyStatus = false
-        let authorizedValue = eval('authorized.' + key)
-        let dataValue = eval('data.' + key)
+        let authorizedValue = getValueFromObject(authorized, key);
+        let dataValue = getValueFromObject(data, key);
 
         if (!authorizedValue && !unauthorize) {
-            if (key.endsWith(']')) {
-                let lastIndex = key.lastIndexOf('[')
-                let index = key.slice(lastIndex + 1).slice(0, -1)
-                let nkey = key.slice(0, key.length - (index.length + 2))
-                console.log(index, nkey);
-                eval(`data.${nkey}.splice(${index}, 1)`)
-            } else
-                eval(`delete data.${key}`)
+            data = deleteKey(data, key)
         } else if (typeof dataValue == "string") {
             if (unauthorize && authorizedValue.includes(dataValue))
-                eval(`delete data.${key}`)
+                data = deleteKey(data, key)
             else {
                 if (!authorizedValue.includes(dataValue))
-                    eval(`delete data.${key}`)
+                    data = deleteKey(data, key)
                 else
                     keyStatus = true
             }
-
         } else if (Array.isArray(dataValue)) {
             for (let i = 0; i < dataValue.length; i++) {
-                let nkey = key + `[${i}]`
-                keyStatus = await checkArray(authorized, data, nkey, unauthorize)
+                keyStatus = await checkArray(authorized, data, `${key}[${i}]`, unauthorize)
             }
         } else if (typeof dataValue === "object") {
-            if (authorizedValue['*'] || authorizedValue['*'] == '') {
-                keyStatus = true
-            } else
-                for (const k of Object.keys(dataValue)) {
-                    let nkey = `${key}.${k}`
-                    keyStatus = await checkArray(authorized, data, nkey, unauthorize)
-                }
+            let checkKeys = true
+            if (dataValue['_id']) {
+                if (authorized.document.includes(dataValue['_id']))
+                    checkKeys = true
+            }
+            if (checkKeys) {
+                if (authorizedValue['*'] || authorizedValue['*'] == '')
+                    keyStatus = true
+                else
+                    for (const k of Object.keys(dataValue)) {
+                        keyStatus = await checkArray(authorized, data, `${key}.${k}`, unauthorize)
+                    }
+            }
         }
+
         return keyStatus
     }
 
@@ -363,6 +367,14 @@
                     return true
             }
         }
+    }
+
+    function deleteKey(data, path) {
+        if (!data || !path) return
+        if (path.includes('._id'))
+            path = path.replace('._id', '');
+        data = dotNotationToObject({ [path]: undefined }, data)
+        return data
     }
 
     return {
