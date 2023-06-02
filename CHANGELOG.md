@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.1.0...v1.2.0) (2023-06-02)
+
+
+### Bug Fixes
+
+* html formating ([0882b10](https://github.com/CoCreate-app/CoCreate-authorize/commit/0882b10bd6ad41909b8f834a4828620a5253331d))
+
+
+### Features
+
+* Added support for utils package ([c05d7da](https://github.com/CoCreate-app/CoCreate-authorize/commit/c05d7dae1ec85687f753737a790021ff01b90450))
+
 # [1.1.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.0.0...v1.1.0) (2023-06-01)
 
 
