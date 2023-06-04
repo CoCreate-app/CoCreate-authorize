@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.2.0...v1.2.1) (2023-06-04)
+
+
+### Bug Fixes
+
+* **semantic-release:** worklow error solved by running node version 14 ([111e8f2](https://github.com/CoCreate-app/CoCreate-authorize/commit/111e8f2593f6b39ce5fb6ce7c5981cd7213b2a25))
+
 # [1.2.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.1.0...v1.2.0) (2023-06-02)
 
 
