@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.2.2...v1.3.0) (2023-06-08)
+
+
+### Bug Fixes
+
+* Refactor CoCreate.config.js to remove hard-coded credentials ([aaf5f58](https://github.com/CoCreate-app/CoCreate-authorize/commit/aaf5f58d8a21f5b2a2d4bf15fd6e90da3076e2e2))
+
+
+### Features
+
+* Update automated.yml for CoCreate-docs with new environment variables ([12d2fb8](https://github.com/CoCreate-app/CoCreate-authorize/commit/12d2fb89541289ac68e012e86c6a82bdf75a1ed3))
+
 ## [1.2.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.2.1...v1.2.2) (2023-06-04)
 
 
