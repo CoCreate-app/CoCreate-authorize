@@ -190,8 +190,8 @@
             return permission
         if (permission.organization_id !== organization_id)
             return false;
-        if (permission.hosts && permission.hosts.length) {
-            if (!permission.hosts || (!permission.hosts.includes(data.host) && !permission.hosts.includes("*")))
+        if (permission.host && permission.host.length) {
+            if (!permission.host || (!permission.host.includes(data.host) && !permission.host.includes("*")))
                 return false;
 
         }
