@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.4...v1.3.5) (2023-06-11)
+
+
+### Bug Fixes
+
+* @cocreate/cli moved to dependencies ([3d5c834](https://github.com/CoCreate-app/CoCreate-authorize/commit/3d5c834aea4618e1cf6b09672d8a49caa2aaca93))
+
 ## [1.3.4](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.3...v1.3.4) (2023-06-11)
 
 
