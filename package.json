@@ -44,10 +44,8 @@
     "url": "https://github.com/sponsors/CoCreate-app"
   },
   "main": "./src/index.js",
-  "devDependencies": {
-    "@cocreate/cli": "^1.33.0"
-  },
   "dependencies": {
+    "@cocreate/cli": "^1.33.0",
     "@cocreate/crud-client": "^1.21.13",
     "@cocreate/utils": "^1.21.5"
   }
