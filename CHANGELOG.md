@@ -1,3 +1,10 @@
+## [1.3.11](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.10...v1.3.11) (2023-06-11)
+
+
+### Bug Fixes
+
+* testing workflow ([9223830](https://github.com/CoCreate-app/CoCreate-authorize/commit/922383028ffb0e989ea48867e7dd24024171861b))
+
 ## [1.3.10](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.9...v1.3.10) (2023-06-11)
 
 
