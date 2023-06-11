@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.5...v1.3.6) (2023-06-11)
+
+
+### Bug Fixes
+
+* postintall error ([045a616](https://github.com/CoCreate-app/CoCreate-authorize/commit/045a61651690b928206c3b3ed7603fcea14304ac))
+
 ## [1.3.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.4...v1.3.5) (2023-06-11)
 
 
