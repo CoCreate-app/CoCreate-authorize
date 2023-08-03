@@ -18,24 +18,24 @@
     const permissions = new Map()
 
     if (isBrowser) {
-        crud.listen('updateDocument', function (data) {
+        crud.listen('update.object', function (data) {
             updatePermission(data)
         });
 
-        crud.listen('deleteDocument', function (data) {
+        crud.listen('delete.object', function (data) {
             deletePermission(data)
         });
     } else {
-        process.on('changed-document', async (data) => {
+        process.on('changed-object', async (data) => {
             updatePermission(data)
         })
     }
 
     async function updatePermission(data) {
-        const { collection, document, organization_id } = data
+        const { array, object, organization_id } = data
 
-        if (collection === 'keys' && document) {
-            let permission = document[0]
+        if (array === 'keys' && object) {
+            let permission = object[0]
             if (permission && permission.key && hasPermission(permission.key)) {
                 let newPermission = await readPermisson(permission.key, organization_id)
                 setPermission(permission.key, newPermission)
@@ -44,10 +44,10 @@
     }
 
     async function deletePermission(data) {
-        const { collection, document, organization_id } = data
+        const { array, object, organization_id } = data
 
-        if (collection === 'keys' && document) {
-            let permission = document[0]
+        if (array === 'keys' && object) {
+            let permission = object[0]
             if (permission && permission.key && hasPermission(permission.key)) {
                 permissions.delete(permission.key)
             }
@@ -78,7 +78,7 @@
                 return null;
 
             let request = {
-                collection: 'keys',
+                array: 'keys',
                 organization_id,
                 filter: {
                     query: []
@@ -91,12 +91,12 @@
                 request.filter.query.push({ name: 'default', value: true, operator: '$eq' })
 
 
-            let permission = await crud.readDocument(request)
-            if (permission && permission.document && permission.document[0]) {
-                permission = permission.document[0]
+            let permission = await crud.sent(request)
+            if (permission && permission.object && permission.object[0]) {
+                permission = permission.object[0]
 
-                if (!permission.collections) {
-                    permission.collections = {};
+                if (!permission.arrays) {
+                    permission.arrays = {};
                 }
 
                 if (permission && permission.roles) {
@@ -108,10 +108,10 @@
 
                     delete request.filter
                     delete request.request
-                    request.document = role_ids
+                    request.object = role_ids
 
-                    let roles = await crud.readDocument(request)
-                    roles = roles.document
+                    let roles = await crud.send(request)
+                    roles = roles.object
 
                     permission = createPermissionObject(permission, roles)
                 }
@@ -162,26 +162,25 @@
         return permission;
     }
 
-    async function check(action, data, user_id) {
+    async function check(data, user_id) {
         let permission = false
         if (user_id) {
             permission = await checkPermissionObject({
                 key: user_id,
-                action,
                 data
             })
         }
         if (!permission || permission.error) {
             permission = await checkPermissionObject({
                 key: data.key,
-                action,
                 data
             })
         }
         return permission;
     }
 
-    async function checkPermissionObject({ key, action, data }) {
+    async function checkPermissionObject({ key, data }) {
+        let action = data.method
         let { organization_id, filter, endPoint } = data
         if (!key || !organization_id) return false;
 
@@ -331,7 +330,7 @@
         } else if (typeof dataValue === "object") {
             let checkKeys = true
             if (dataValue['_id']) {
-                if (authorized.document.includes(dataValue['_id']))
+                if (authorized.object.includes(dataValue['_id']))
                     checkKeys = true
             }
             if (checkKeys) {
@@ -350,9 +349,9 @@
     async function checkFilter(authorized, data, key, unauthorize) {
         if (data.filter && data.filter.query) {
             let name
-            if (data.filter.type == 'document')
+            if (data.filter.type == 'object')
                 name = '_id'
-            else if (data.filter.type == 'collection')
+            else if (data.filter.type == 'array')
                 name = 'name'
             if (name) {
                 for (let value of authorized[key]) {
