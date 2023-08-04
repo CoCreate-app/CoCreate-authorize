@@ -72,7 +72,7 @@
         }
     }
 
-    async function readPermisson(apikey, organization_id) {
+    async function readPermisson(key, organization_id) {
         try {
             if (!organization_id)
                 return null;
@@ -86,7 +86,7 @@
             }
 
             if (key)
-                request.filter.query.push({ key: 'key', value: apikey, operator: '$eq' })
+                request.filter.query.push({ key: 'key', value: key, operator: '$eq' })
             else
                 request.filter.query.push({ key: 'default', value: true, operator: '$eq' })
 
