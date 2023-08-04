@@ -72,7 +72,7 @@
         }
     }
 
-    async function readPermisson(key, organization_id) {
+    async function readPermisson(apikey, organization_id) {
         try {
             if (!organization_id)
                 return null;
@@ -86,9 +86,9 @@
             }
 
             if (key)
-                request.filter.query.push({ name: 'key', value: key, operator: '$eq' })
+                request.filter.query.push({ key: 'key', value: apikey, operator: '$eq' })
             else
-                request.filter.query.push({ name: 'default', value: true, operator: '$eq' })
+                request.filter.query.push({ key: 'default', value: true, operator: '$eq' })
 
 
             let permission = await crud.sent(request)
@@ -346,21 +346,21 @@
         return keyStatus
     }
 
-    async function checkFilter(authorized, data, key, unauthorize) {
+    async function checkFilter(authorized, data, apikey, unauthorize) {
         if (data.filter && data.filter.query) {
-            let name
+            let key
             if (data.filter.type == 'object')
-                name = '_id'
+                key = '_id'
             else if (data.filter.type == 'array')
-                name = 'name'
-            if (name) {
-                for (let value of authorized[key]) {
-                    if (value[name])
-                        value = value[name]
+                key = 'name'
+            if (key) {
+                for (let value of authorized[apikey]) {
+                    if (value[key])
+                        value = value[key]
                     if (unauthorize)
-                        data.filter.query.push({ name, value, operator: '$ne', logicalOperator: 'or' })
+                        data.filter.query.push({ key, value, operator: '$ne', logicalOperator: 'or' })
                     else
-                        data.filter.query.push({ name, value, operator: '$eq', logicalOperator: 'or' })
+                        data.filter.query.push({ key, value, operator: '$eq', logicalOperator: 'or' })
                 }
                 if (!unauthorize)
                     return true
