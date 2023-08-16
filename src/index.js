@@ -91,7 +91,7 @@
                 request.filter.query.push({ key: 'default', value: true, operator: '$eq' })
 
 
-            let permission = await crud.sent(request)
+            let permission = await crud.send(request)
             if (permission && permission.object && permission.object[0]) {
                 permission = permission.object[0]
 
