@@ -1,3 +1,18 @@
+# [1.4.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.14...v1.4.0) (2023-08-16)
+
+
+### Bug Fixes
+
+* crud attributes renamed ([6c66db2](https://github.com/CoCreate-app/CoCreate-authorize/commit/6c66db2efd13914e1315df639335624cf75d433a))
+* Refactored *-target to *-selector ([bc6e173](https://github.com/CoCreate-app/CoCreate-authorize/commit/bc6e173f053d8441c60d85382db0c277259b78ce))
+* typo crud.sent updated to crud.send ([a705592](https://github.com/CoCreate-app/CoCreate-authorize/commit/a7055922b05c82be1f4786552c7df60c7e7ed11d))
+* webpack.config and package.json make use of mode=production instead of process.env ([94334dc](https://github.com/CoCreate-app/CoCreate-authorize/commit/94334dc7ebfa724383c477eb6833eb9f6c3461e2))
+
+
+### Features
+
+* name attribute and variable renamed to key ([e09073e](https://github.com/CoCreate-app/CoCreate-authorize/commit/e09073e69ab810d8fbd08b37ae955df324a0be72))
+
 ## [1.3.14](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.13...v1.3.14) (2023-06-14)
 
 
