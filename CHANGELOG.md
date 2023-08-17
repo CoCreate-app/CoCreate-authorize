@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.4.0...v1.5.0) (2023-08-17)
+
+
+### Features
+
+* bump cocreate dependencies for the latest updates and features ([6614a3a](https://github.com/CoCreate-app/CoCreate-authorize/commit/6614a3ab6c0f31a430f61f94908752c8eb24baeb))
+
 # [1.4.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.3.14...v1.4.0) (2023-08-16)
 
 
