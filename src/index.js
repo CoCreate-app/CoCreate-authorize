@@ -78,6 +78,7 @@
                 return null;
 
             let request = {
+                method: 'read.object',
                 array: 'keys',
                 organization_id,
                 filter: {
