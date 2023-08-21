@@ -173,7 +173,7 @@
         }
         if (!permission || permission.error) {
             permission = await checkPermissionObject({
-                key: data.key,
+                key: data.apikey,
                 data
             })
         }
