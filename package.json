@@ -45,7 +45,7 @@
   },
   "main": "./src/index.js",
   "dependencies": {
-    "@cocreate/crud-client": "^1.22.0",
-    "@cocreate/utils": "^1.22.0"
+    "@cocreate/crud-client": "^1.23.1",
+    "@cocreate/utils": "^1.23.1"
   }
 }
