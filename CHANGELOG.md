@@ -1,3 +1,13 @@
+## [1.5.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.5.0...v1.5.1) (2023-08-21)
+
+
+### Bug Fixes
+
+* /dist/CoCreate.js updated to https://CoCreate.app/dist/CoCreate.js ([c4155f3](https://github.com/CoCreate-app/CoCreate-authorize/commit/c4155f34689265420a6586e695207acf08b39c6e))
+* add method to crud object ([92c233a](https://github.com/CoCreate-app/CoCreate-authorize/commit/92c233a97fd950bfa7b7c3ba5a6f18fa1ed9bc4a))
+* replace cdn with /dist ([795573d](https://github.com/CoCreate-app/CoCreate-authorize/commit/795573d27f41674b054c0c40696ccd69f793091c))
+* update file uploader ([95d8ad8](https://github.com/CoCreate-app/CoCreate-authorize/commit/95d8ad859292abe279cc7c83b57ee4e8ccecd415))
+
 # [1.5.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.4.0...v1.5.0) (2023-08-17)
 
 
