@@ -15,64 +15,64 @@
     }
 }(typeof self !== 'undefined' ? self : this, function (isBrowser, crud, { getValueFromObject, dotNotationToObject }) {
 
-    const permissions = new Map()
+    const authorizations = new Map()
 
     if (isBrowser) {
         crud.listen('update.object', function (data) {
-            updatePermission(data)
+            updateAuthorization(data)
         });
 
         crud.listen('delete.object', function (data) {
-            deletePermission(data)
+            deleteAuthorization(data)
         });
     } else {
         process.on('changed-object', async (data) => {
-            updatePermission(data)
+            updateAuthorization(data)
         })
     }
 
-    async function updatePermission(data) {
+    async function updateAuthorization(data) {
         const { array, object, organization_id } = data
 
         if (array === 'keys' && object) {
-            let permission = object[0]
-            if (permission && permission.key && hasPermission(permission.key)) {
-                let newPermission = await readPermisson(permission.key, organization_id)
-                setPermission(permission.key, newPermission)
+            let authorization = object[0]
+            if (authorization && authorization.key && hasAuthorization(authorization.key)) {
+                let newAuthorization = await readAuthorization(authorization.key, organization_id)
+                setAuthorization(authorization.key, newAuthorization)
             }
         }
     }
 
-    async function deletePermission(data) {
+    async function deleteAuthorization(data) {
         const { array, object, organization_id } = data
 
         if (array === 'keys' && object) {
-            let permission = object[0]
-            if (permission && permission.key && hasPermission(permission.key)) {
-                permissions.delete(permission.key)
+            let authorization = object[0]
+            if (authorization && authorization.key && hasAuthorization(authorization.key)) {
+                authorizations.delete(authorization.key)
             }
         }
     }
 
-    function setPermission(key, permission) {
-        permissions.set(key, permission)
+    function setAuthorization(key, authorization) {
+        authorizations.set(key, authorization)
     }
 
-    function hasPermission(key) {
-        return permissions.has(key)
+    function hasAuthorization(key) {
+        return authorizations.has(key)
     }
 
-    async function getPermission(key, organization_id) {
-        if (permissions.get(key)) {
-            return permissions.get(key)
+    async function getAuthorization(key, organization_id) {
+        if (authorizations.get(key)) {
+            return authorizations.get(key)
         } else {
-            let permission = await readPermisson(key, organization_id);
-            permissions.set(key, permission)
-            return permission
+            let authorization = await readAuthorization(key, organization_id);
+            authorizations.set(key, authorization)
+            return authorization
         }
     }
 
-    async function readPermisson(key, organization_id) {
+    async function readAuthorization(key, organization_id) {
         try {
             if (!organization_id)
                 return null;
@@ -92,17 +92,17 @@
                 request.filter.query.push({ key: 'default', value: true, operator: '$eq' })
 
 
-            let permission = await crud.send(request)
-            if (permission && permission.object && permission.object[0]) {
-                permission = permission.object[0]
+            let authorization = await crud.send(request)
+            if (authorization && authorization.object && authorization.object[0]) {
+                authorization = authorization.object[0]
 
-                if (!permission.arrays) {
-                    permission.arrays = {};
+                if (!authorization.arrays) {
+                    authorization.arrays = {};
                 }
 
-                if (permission && permission.roles) {
+                if (authorization && authorization.roles) {
                     const role_ids = []
-                    permission.roles.forEach((_id) => {
+                    authorization.roles.forEach((_id) => {
                         if (_id)
                             role_ids.push({ _id })
                     })
@@ -114,91 +114,91 @@
                     let roles = await crud.send(request)
                     roles = roles.object
 
-                    permission = createPermissionObject(permission, roles)
+                    authorization = createAuthorization(authorization, roles)
                 }
 
             }
 
-            return permission;
+            return authorization;
 
         } catch (error) {
-            console.log("Permission Error", error)
+            console.log("authorization Error", error)
             return null;
         }
 
     }
 
-    async function createPermissionObject(permission, roles) {
+    async function createAuthorization(authorization, roles) {
         roles.map(role => {
             for (const roleKey in role) {
                 if (!["_id", "type", "name", "organization_id"].includes(roleKey)) {
-                    if (!permission[roleKey]) {
-                        permission[roleKey] = role[roleKey]
+                    if (!authorization[roleKey]) {
+                        authorization[roleKey] = role[roleKey]
                     } else {
                         if (Array.isArray(role[roleKey])) {
                             for (let item of role[roleKey]) {
-                                if (!permission[roleKey].includes(item))
-                                    permission[roleKey].push(item)
+                                if (!authorization[roleKey].includes(item))
+                                    authorization[roleKey].push(item)
                             }
                         }
                         else if (typeof role[roleKey] == 'object') {
                             for (const c of Object.keys(role[roleKey])) {
-                                if (!permission[roleKey][c]) {
-                                    permission[roleKey][c] = role[roleKey][c]
+                                if (!authorization[roleKey][c]) {
+                                    authorization[roleKey][c] = role[roleKey][c]
                                 } else {
                                     if (typeof role[roleKey][c] == 'object') {
-                                        permission[roleKey][c] = { ...permission[roleKey][c], ...role[roleKey][c] }
+                                        authorization[roleKey][c] = { ...authorization[roleKey][c], ...role[roleKey][c] }
                                     } else {
-                                        permission[roleKey][c] = role[roleKey][c]
+                                        authorization[roleKey][c] = role[roleKey][c]
                                     }
                                 }
                             }
                         } else {
-                            permission[roleKey] = role[roleKey]
+                            authorization[roleKey] = role[roleKey]
                         }
                     }
                 }
             }
         })
-        return permission;
+        return authorization;
     }
 
     async function check(data, user_id) {
-        let permission = false
+        let authorization = false
         if (user_id) {
-            permission = await checkPermissionObject({
+            authorization = await checkAuthorization({
                 key: user_id,
                 data
             })
         }
-        if (!permission || permission.error) {
-            permission = await checkPermissionObject({
+        if (!authorization || authorization.error) {
+            authorization = await checkAuthorization({
                 key: data.apikey,
                 data
             })
         }
-        return permission;
+        return authorization;
     }
 
-    async function checkPermissionObject({ key, data }) {
-        let action = data.method
-        let { organization_id, filter, endPoint } = data
+    async function checkAuthorization({ key, data }) {
+        // let method = data.method
+        let { method, organization_id, filter, endPoint } = data
         if (!key || !organization_id) return false;
 
-        let permission = await getPermission(key, organization_id)
-        if (!permission || permission.error)
-            return permission
-        if (permission.organization_id !== organization_id)
+        let autorized = await getAuthorization(key, organization_id)
+        if (!autorized || autorized.error)
+            return autorized
+        if (autorized.organization_id !== organization_id)
             return false;
-        if (permission.host && permission.host.length) {
-            if (!permission.host || (!permission.host.includes(data.host) && !permission.host.includes("*")))
+        if (autorized.host && autorized.host.length) {
+            if (!autorized.host || (!autorized.host.includes(data.host) && !autorized.host.includes("*")))
                 return false;
 
         }
-        if (permission.admin == 'true' || permission.admin === true)
+        if (autorized.admin == 'true' || autorized.admin === true)
             return true;
 
-        let status = await checkAction(permission.actions, action, endPoint, data, filter)
+        let status = await checkMethod(autorized.actions, method, endPoint, data, filter)
 
         if (!status)
             return false
@@ -206,19 +206,19 @@
         return { authorized: data };
     }
 
-    async function checkAction(permissions, action, endPoint, data) {
-        if (!permissions || !action || !permissions[action] || permissions[action] == 'false') return false;
-        if (permissions[action] === true || permissions[action] == 'true' || permissions[action] == '*') return true;
+    async function checkMethod(autorized, method, endPoint, data) {
+        if (!autorized || !method || !autorized[method] || autorized[method] == 'false') return false;
+        if (autorized[method] === true || autorized[method] == 'true' || autorized[method] == '*') return true;
 
-        let authorized = permissions[action].authorize
+        let authorized = autorized[method].authorize
         if (authorized) {
-            let status = await checkAthorized(authorized, action, endPoint, data)
+            let status = await checkAthorized(authorized, method, endPoint, data)
             if (!status)
                 return false
             else {
-                let unauthorized = permissions[action].unauthorize
+                let unauthorized = autorized[method].unauthorize
                 if (unauthorized) {
-                    let status = await checkAthorized(unauthorized, action, endPoint, data, true)
+                    let status = await checkAthorized(unauthorized, method, endPoint, data, true)
                     if (status)
                         return false
                 }
@@ -228,7 +228,7 @@
             return false
     }
 
-    async function checkAthorized(authorized, action, endPoint, data, unauthorize) {
+    async function checkAthorized(authorized, method, endPoint, data, unauthorize) {
         if (!Array.isArray(authorized))
             authorized = [authorized]
 
@@ -250,7 +250,7 @@
 
             // if authorized[i] is an object
             for (const key of Object.keys(authorized[i])) {
-                status = await checkAthorizedKey(authorized[i], action, endPoint, data, key, unauthorize)
+                status = await checkAthorizedKey(authorized[i], method, endPoint, data, key, unauthorize)
             }
 
         }
@@ -259,7 +259,7 @@
 
     }
 
-    async function checkAthorizedKey(authorized, action, endPoint, data, key, unauthorize) {
+    async function checkAthorizedKey(authorized, method, endPoint, data, key, unauthorize) {
         let status = false;
         let keyStatus = false;
 
@@ -297,12 +297,12 @@
 
         // if key status is false for unauthorized case
         if (!keyStatus || keyStatus && unauthorize) {
-            if (!data.unauthorized || !data.unauthorized[action])
-                data.unauthorized = { [action]: { [key]: [data[key]] } }
-            else if (!data.unauthorized[action][key])
-                data.unauthorized[action][key] = [data[key]]
+            if (!data.unauthorized || !data.unauthorized[method])
+                data.unauthorized = { [method]: { [key]: [data[key]] } }
+            else if (!data.unauthorized[method][key])
+                data.unauthorized[method][key] = [data[key]]
             else
-                data.unauthorized[action][key].push(data[key])
+                data.unauthorized[method][key].push(data[key])
         } else
             status = true
         return status
