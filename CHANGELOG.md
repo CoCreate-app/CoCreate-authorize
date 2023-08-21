@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.3...v1.6.4) (2023-08-21)
+
+
+### Bug Fixes
+
+* update permission functions and variable to authorize for improved clarity and readability ([05f6006](https://github.com/CoCreate-app/CoCreate-authorize/commit/05f6006058e5dc49f81395f6860c2586936727ea))
+
 ## [1.6.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.2...v1.6.3) (2023-08-21)
 
 
