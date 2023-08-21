@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.5.1...v1.6.0) (2023-08-21)
+
+
+### Features
+
+* Update cocreate dependencies for the latest features and bug fixes ([59442d7](https://github.com/CoCreate-app/CoCreate-authorize/commit/59442d7c3f5c074da977f0ee7f6c3a5523e64985))
+
 ## [1.5.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.5.0...v1.5.1) (2023-08-21)
 
 
