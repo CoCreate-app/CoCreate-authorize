@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.2...v1.6.3) (2023-08-21)
+
+
+### Bug Fixes
+
+* removed build as no webpack.config exists ([1beeb28](https://github.com/CoCreate-app/CoCreate-authorize/commit/1beeb28f741bba7b102560b985afbfaa8a68799f))
+
 ## [1.6.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.1...v1.6.2) (2023-08-21)
 
 
