@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.1...v1.6.2) (2023-08-21)
+
+
+### Bug Fixes
+
+* use data.apikey ([985bbcd](https://github.com/CoCreate-app/CoCreate-authorize/commit/985bbcd87ca5db8fc672f359e6bc2ea8ced4a2d7))
+
 ## [1.6.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.0...v1.6.1) (2023-08-21)
 
 
