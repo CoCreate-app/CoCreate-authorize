@@ -81,15 +81,17 @@
                 method: 'read.object',
                 array: 'keys',
                 organization_id,
-                filter: {
-                    query: []
+                object: {
+                    $filter: {
+                        query: []
+                    }
                 }
             }
 
             if (key)
-                request.filter.query.push({ key: 'key', value: key, operator: '$eq' })
+                request.object.$filter.query.push({ key: 'key', value: key, operator: '$eq' })
             else
-                request.filter.query.push({ key: 'default', value: true, operator: '$eq' })
+                request.object.$filter.query.push({ key: 'default', value: true, operator: '$eq' })
 
 
             let authorization = await crud.send(request)
@@ -107,7 +109,7 @@
                             role_ids.push({ _id })
                     })
 
-                    delete request.filter
+                    delete request.object.$filter
                     delete request.request
                     request.object = role_ids
 
@@ -182,7 +184,7 @@
 
     async function checkAuthorization({ key, data }) {
         // let method = data.method
-        let { method, organization_id, filter, endPoint } = data
+        let { method, organization_id, endPoint } = data
         if (!key || !organization_id) return false;
 
         let autorized = await getAuthorization(key, organization_id)
@@ -198,7 +200,7 @@
         if (autorized.admin == 'true' || autorized.admin === true)
             return true;
 
-        let status = await checkMethod(autorized.actions, method, endPoint, data, filter)
+        let status = await checkMethod(autorized.actions, method, endPoint, data)
 
         if (!status)
             return false
@@ -348,20 +350,20 @@
     }
 
     async function checkFilter(authorized, data, apikey, unauthorize) {
-        if (data.filter && data.filter.query) {
+        if (data.object.$filter && data.object.$filter.query) {
             let key
-            if (data.filter.type == 'object')
+            if (data.object.$filter.type == 'object')
                 key = '_id'
-            else if (data.filter.type == 'array')
+            else if (data.object.$filter.type == 'array')
                 key = 'name'
             if (key) {
                 for (let value of authorized[apikey]) {
                     if (value[key])
                         value = value[key]
                     if (unauthorize)
-                        data.filter.query.push({ key, value, operator: '$ne', logicalOperator: 'or' })
+                        data.object.$filter.query.push({ key, value, operator: '$ne', logicalOperator: 'or' })
                     else
-                        data.filter.query.push({ key, value, operator: '$eq', logicalOperator: 'or' })
+                        data.object.$filter.query.push({ key, value, operator: '$eq', logicalOperator: 'or' })
                 }
                 if (!unauthorize)
                     return true
