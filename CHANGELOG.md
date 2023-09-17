@@ -1,3 +1,10 @@
+## [1.6.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.4...v1.6.5) (2023-09-17)
+
+
+### Bug Fixes
+
+* object.$filter ([8f20e93](https://github.com/CoCreate-app/CoCreate-authorize/commit/8f20e93c1fcc91d7046d8024abce934952e4e2ee))
+
 ## [1.6.4](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.3...v1.6.4) (2023-08-21)
 
 
