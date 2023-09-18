@@ -1,3 +1,11 @@
+## [1.6.6](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.5...v1.6.6) (2023-09-18)
+
+
+### Bug Fixes
+
+*  Add path and pathname ([dbc1944](https://github.com/CoCreate-app/CoCreate-authorize/commit/dbc1944405b53993fa75d7a1ff0930f9ac3d9a9d))
+* Update dCoCreate dpendencies to latest versions ([cc7bbec](https://github.com/CoCreate-app/CoCreate-authorize/commit/cc7bbec2cedf44d338bfa681ce038d670a6363dc))
+
 ## [1.6.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.4...v1.6.5) (2023-09-17)
 
 
