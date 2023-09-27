@@ -63,12 +63,28 @@
     }
 
     async function getAuthorization(key, organization_id) {
-        if (authorizations.get(key)) {
-            return authorizations.get(key)
-        } else {
-            let authorization = await readAuthorization(key, organization_id);
-            authorizations.set(key, authorization)
-            return authorization
+        // Check if there is a value orpending promise for this key
+        if (authorizations.has(key)) {
+            // Return the value or pending promise
+            return authorizations.get(key);
+        }
+
+        // Create a new promise and store it
+        const authorizationPromise = readAuthorization(key, organization_id);
+        authorizations.set(key, authorizationPromise);
+
+        try {
+            // Wait for the authorization to be resolved
+            const authorization = await authorizationPromise;
+
+            // Once resolved, store the resolved authorization in the map
+            authorizations.set(key, authorization);
+
+            return authorization;
+        } catch (error) {
+            // Handle errors if necessary
+            authorizations.delete(key);
+            throw error;
         }
     }
 
