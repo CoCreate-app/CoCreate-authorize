@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.0...v1.7.1) (2023-10-09)
+
+
+### Bug Fixes
+
+* getAuthorization returns authorization object or promise, resulting in the key only being read once ([7b490a5](https://github.com/CoCreate-app/CoCreate-authorize/commit/7b490a515e46704d20f325ada839d3dfd1cc2099))
+
 # [1.7.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.6.6...v1.7.0) (2023-09-19)
 
 
