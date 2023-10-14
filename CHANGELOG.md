@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.2...v1.7.3) (2023-10-14)
+
+
+### Bug Fixes
+
+* bump dependencies ([8ef2dc2](https://github.com/CoCreate-app/CoCreate-authorize/commit/8ef2dc28d6f633e182f5aa3d0b395996ce5e9c78))
+
 ## [1.7.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.1...v1.7.2) (2023-10-09)
 
 
