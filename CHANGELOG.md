@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.3...v1.7.4) (2023-10-16)
+
+
+### Bug Fixes
+
+* improved error handling ([05dd30f](https://github.com/CoCreate-app/CoCreate-authorize/commit/05dd30faa849090707d2b65c724441e071ee5fff))
+
 ## [1.7.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.2...v1.7.3) (2023-10-14)
 
 
