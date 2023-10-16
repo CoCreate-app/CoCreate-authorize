@@ -91,7 +91,7 @@
     async function readAuthorization(key, organization_id) {
         try {
             if (!organization_id)
-                return null;
+                return { error: 'An organization_id is required' };
 
             let request = {
                 method: 'read.object',
@@ -141,7 +141,7 @@
 
         } catch (error) {
             console.log("authorization Error", error)
-            return null;
+            return { error };
         }
 
     }
@@ -201,22 +201,23 @@
     async function checkAuthorization({ key, data }) {
         // let method = data.method
         let { method, organization_id, endPoint } = data
-        if (!key || !organization_id) return false;
+        if (!organization_id)
+            return { error: '' };
 
-        let autorized = await getAuthorization(key, organization_id)
-        if (!autorized || autorized.error)
-            return autorized
-        if (autorized.organization_id !== organization_id)
+        let authorized = await getAuthorization(key, organization_id)
+        if (!authorized || authorized.error)
+            return authorized
+        if (authorized.organization_id !== organization_id)
             return false;
-        if (autorized.host && autorized.host.length) {
-            if (!autorized.host || (!autorized.host.includes(data.host) && !autorized.host.includes("*")))
+        if (authorized.host && authorized.host.length) {
+            if (!authorized.host || (!authorized.host.includes(data.host) && !authorized.host.includes("*")))
                 return false;
 
         }
-        if (autorized.admin == 'true' || autorized.admin === true)
+        if (authorized.admin == 'true' || authorized.admin === true)
             return true;
 
-        let status = await checkMethod(autorized.actions, method, endPoint, data)
+        let status = await checkMethod(authorized.actions, method, endPoint, data)
 
         if (!status)
             return false
