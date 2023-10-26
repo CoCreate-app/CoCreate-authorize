@@ -64,9 +64,9 @@
 
     async function getAuthorization(key, organization_id) {
         // Check if there is a value orpending promise for this key
-        if (authorizations.has(key)) {
+        if (key && authorizations.has(key)) {
             // Return the value or pending promise
-            return authorizations.get(key);
+            return await authorizations.get(key);
         }
 
         // Create a new promise and store it
@@ -97,17 +97,16 @@
                 method: 'read.object',
                 array: 'keys',
                 organization_id,
-                object: {
-                    $filter: {
-                        query: []
-                    }
+                object: {},
+                $filter: {
+                    query: []
                 }
             }
 
             if (key)
-                request.object.$filter.query.push({ key: 'key', value: key, operator: '$eq' })
+                request.$filter.query.push({ key: 'key', value: key, operator: '$eq' })
             else
-                request.object.$filter.query.push({ key: 'default', value: true, operator: '$eq' })
+                request.$filter.query.push({ key: 'default', value: true, operator: '$eq' })
 
 
             let authorization = await crud.send(request)
