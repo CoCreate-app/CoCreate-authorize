@@ -1,3 +1,10 @@
+## [1.7.6](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.5...v1.7.6) (2023-10-26)
+
+
+### Bug Fixes
+
+* await key to resolve, update filters ([f69bdb7](https://github.com/CoCreate-app/CoCreate-authorize/commit/f69bdb72fe8c4b7ce8a2993699c8611442373e12))
+
 ## [1.7.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.4...v1.7.5) (2023-10-25)
 
 
