@@ -15,7 +15,7 @@
     }
 }(typeof self !== 'undefined' ? self : this, function (isBrowser, crud, { getValueFromObject, dotNotationToObject }) {
 
-    const authorizations = new Map()
+    const organizations = {}
 
     if (isBrowser) {
         crud.listen('update.object', function (data) {
@@ -36,9 +36,9 @@
 
         if (array === 'keys' && object) {
             let authorization = object[0]
-            if (authorization && authorization.key && hasAuthorization(authorization.key)) {
+            if (authorization && authorization.key && organizations[organization_id] && organizations[organization_id][authorization.key]) {
                 let newAuthorization = await readAuthorization(authorization.key, organization_id)
-                setAuthorization(authorization.key, newAuthorization)
+                organizations[organization_id][authorization.key] = newAuthorization
             }
         }
     }
@@ -48,44 +48,21 @@
 
         if (array === 'keys' && object) {
             let authorization = object[0]
-            if (authorization && authorization.key && hasAuthorization(authorization.key)) {
-                authorizations.delete(authorization.key)
+            if (authorization && authorization.key && organizations[organization_id] && organizations[organization_id][authorization.key]) {
+                delete organizations[organization_id][authorization.key]
             }
         }
     }
 
-    function setAuthorization(key, authorization) {
-        authorizations.set(key, authorization)
-    }
-
-    function hasAuthorization(key) {
-        return authorizations.has(key)
-    }
-
     async function getAuthorization(key, organization_id) {
-        // Check if there is a value orpending promise for this key
-        if (key && authorizations.has(key)) {
-            // Return the value or pending promise
-            return await authorizations.get(key);
-        }
+        if (!organizations[organization_id])
+            organizations[organization_id] = {}
 
-        // Create a new promise and store it
-        const authorizationPromise = readAuthorization(key, organization_id);
-        authorizations.set(key, authorizationPromise);
+        if (!organizations[organization_id][key])
+            organizations[organization_id][key] = readAuthorization(key, organization_id);
 
-        try {
-            // Wait for the authorization to be resolved
-            const authorization = await authorizationPromise;
-
-            // Once resolved, store the resolved authorization in the map
-            authorizations.set(key, authorization);
-
-            return authorization;
-        } catch (error) {
-            // Handle errors if necessary
-            authorizations.delete(key);
-            throw error;
-        }
+        organizations[organization_id][key] = await organizations[organization_id][key]
+        return organizations[organization_id][key]
     }
 
     async function readAuthorization(key, organization_id) {
@@ -95,9 +72,9 @@
 
             let request = {
                 method: 'read.object',
+                database: organization_id,
                 array: 'keys',
                 organization_id,
-                object: {},
                 $filter: {
                     query: []
                 }
@@ -131,13 +108,11 @@
                     let roles = await crud.send(request)
                     roles = roles.object
 
-                    authorization = createAuthorization(authorization, roles)
+                    authorization = await createAuthorization(authorization, roles)
                 }
-
-            }
-
-            return authorization;
-
+                return authorization;
+            } else
+                return {}
         } catch (error) {
             console.log("authorization Error", error)
             return { error };
