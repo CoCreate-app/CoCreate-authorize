@@ -173,10 +173,9 @@
     }
 
     async function checkAuthorization({ key, data }) {
-        // let method = data.method
         let { method, organization_id, endPoint } = data
         if (!organization_id)
-            return { error: '' };
+            return { error: 'organization_id is required' };
 
         let authorized = await getAuthorization(key, organization_id)
         if (!authorized || authorized.error)
