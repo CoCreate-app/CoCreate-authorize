@@ -185,7 +185,6 @@
         if (authorized.host && authorized.host.length) {
             if (!authorized.host || (!authorized.host.includes(data.host) && !authorized.host.includes("*")))
                 return false;
-
         }
         if (authorized.admin == 'true' || authorized.admin === true)
             return true;
