@@ -101,8 +101,9 @@
                             role_ids.push({ _id })
                     })
 
-                    delete request.object.$filter
-                    delete request.request
+                    delete request.$filter
+                    delete request.isFilter
+
                     request.object = role_ids
 
                     let roles = await crud.send(request)
@@ -198,8 +199,10 @@
     }
 
     async function checkMethod(autorized, method, endPoint, data) {
-        if (!autorized || !method || !autorized[method] || autorized[method] == 'false') return false;
-        if (autorized[method] === true || autorized[method] == 'true' || autorized[method] == '*') return true;
+        if (!autorized || !method || !autorized[method] || autorized[method] == 'false')
+            return false;
+        if (autorized[method] === true || autorized[method] == 'true' || autorized[method] == '*')
+            return true;
 
         let authorized = autorized[method].authorize
         if (authorized) {
