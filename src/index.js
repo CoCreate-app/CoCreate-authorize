@@ -71,7 +71,7 @@
                 return { error: 'An organization_id is required' };
 
             let request = {
-                method: 'read.object',
+                method: 'object.read',
                 database: organization_id,
                 array: 'keys',
                 organization_id,
@@ -174,193 +174,118 @@
     }
 
     async function checkAuthorization({ key, data }) {
-        let { method, organization_id, endPoint } = data
-        if (!organization_id)
+        if (!data.organization_id)
             return { error: 'organization_id is required' };
+        if (!data.method)
+            return { error: 'method is required' };
 
-        let authorized = await getAuthorization(key, organization_id)
+        let authorized = await getAuthorization(key, data.organization_id)
         if (!authorized || authorized.error)
             return authorized
-        if (authorized.organization_id !== organization_id)
+        if (authorized.organization_id !== data.organization_id)
             return false;
         if (authorized.host && authorized.host.length) {
             if (!authorized.host || (!authorized.host.includes(data.host) && !authorized.host.includes("*")))
                 return false;
         }
-        if (authorized.admin == 'true' || authorized.admin === true)
+        if (authorized.admin === 'true' || authorized.admin === true)
             return true;
 
-        let status = await checkMethod(authorized.actions, method, endPoint, data)
+        let status = await checkMethod(data, authorized.actions, data.method)
 
-        if (!status)
+        console.log(data.method, status)
+
+        if (!status) {
+            // if (data.method === 'object.read' && data.array.includes('organizations'))
             return false
+        }
 
         return { authorized: data };
     }
 
-    async function checkMethod(autorized, method, endPoint, data) {
-        if (!autorized || !method || !autorized[method] || autorized[method] == 'false')
-            return false;
-        if (autorized[method] === true || autorized[method] == 'true' || autorized[method] == '*')
-            return true;
-
-        let authorized = autorized[method].authorize
-        if (authorized) {
-            let status = await checkAthorized(authorized, method, endPoint, data)
-            if (!status)
-                return false
-            else {
-                let unauthorized = autorized[method].unauthorize
-                if (unauthorized) {
-                    let status = await checkAthorized(unauthorized, method, endPoint, data, true)
-                    if (status)
-                        return false
-                }
-                return true
-            }
-        } else
-            return false
-    }
-
-    async function checkAthorized(authorized, method, endPoint, data, unauthorize) {
-        if (!Array.isArray(authorized))
-            authorized = [authorized]
-
-        let status = false
-        for (let i = 0; i < authorized.length; i++) {
-            // if authorized[i] is a booleaan
-            if (authorized[i] === true)
-                return true
-
-            // if authorized[i] is a string or an array
-            if (typeof authorized[i] === "string" || Array.isArray(authorized[i])) {
-                if (authorized[i].includes(true) || authorized[i].includes('true') || authorized[i].includes('*'))
-                    return true
-                else if (endPoint)
-                    return authorized.includes(endPoint)
+    async function checkMethod(data, authorized, method) {
+        if (authorized[method]) {
+            return await checkMethodMatch(data, authorized[method], method)
+        } else if (method.includes('.')) {
+            let match = ''
+            let splitMethod = method.split('.')
+            for (let i = 0; i < splitMethod.length; i++) {
+                if (!match)
+                    match = splitMethod[i]
                 else
+                    match += '.' + splitMethod[i]
+                if (authorized[match]) {
+                    return await checkMethodMatch(data, authorized[match], match)
+                } else if (i === splitMethod.length - 1)
                     return false
             }
-
-            // if authorized[i] is an object
-            for (const key of Object.keys(authorized[i])) {
-                status = await checkAthorizedKey(authorized[i], method, endPoint, data, key, unauthorize)
-            }
-
-        }
-
-        return status
-
+        } else
+            return false;
     }
 
-    async function checkAthorizedKey(authorized, method, endPoint, data, key, unauthorize) {
-        let status = false;
-        let keyStatus = false;
-
-        // if authorized[key] is a booleaan
-        if (authorized[key] === true)
-            keyStatus = true
-
-        // if authorized[key] is a string or number
-        else if (typeof authorized[key] === "string" || typeof authorized[key] === "number") {
-            if (authorized[key] === true || authorized[key] === 'true' || authorized[key] === '*')
-                keyStatus = true
-            else if (data[key]) {
-                keyStatus = await checkArray(authorized, data, key, unauthorize)
-                if (await checkFilter(authorized, data, key, unauthorize))
-                    status = true
-            }
-        }
-
-        // if authorized[key] is an array
-        else if (Array.isArray(authorized[key])) {
-            if (authorized[key].includes(true) || authorized[key].includes('true') || authorized[key].includes('*'))
-                keyStatus = true
-            else if (data[key]) {
-                keyStatus = await checkArray(authorized, data, key, unauthorize)
-                if (await checkFilter(authorized, data, key, unauthorize))
-                    status = true
-            }
-        }
-
-        // if authorized[key] is an object
-        else if (typeof authorized[key] === "object") {
-            console.log('authorized[key] is an object', authorized[key])
-        } else
-            delete data[key]
-
-        // if key status is false for unauthorized case
-        if (!keyStatus || keyStatus && unauthorize) {
-            if (!data.unauthorized || !data.unauthorized[method])
-                data.unauthorized = { [method]: { [key]: [data[key]] } }
-            else if (!data.unauthorized[method][key])
-                data.unauthorized[method][key] = [data[key]]
+    async function checkMethodMatch(data, authorized, match) {
+        if (typeof authorized === 'boolean') {
+            return authorized
+        } else if (typeof authorized === 'string') {
+            if (authorized === 'false')
+                return false
+            else if (authorized === 'true')
+                return true
+            else if (authorized === match)
+                return true // check string for match or mutate data
             else
-                data.unauthorized[method][key].push(data[key])
-        } else
-            status = true
-        return status
-    }
+                return true // check string for match or mutate data
+        } else if (typeof authorized === 'number') {
+            return !!authorized
+        } else {
+            let status = false
+            let newmatch = data.method.replace(match, '')
 
-    async function checkArray(authorized, data, key, unauthorize) {
-        let keyStatus = false
-        let authorizedValue = getValueFromObject(authorized, key);
-        let dataValue = getValueFromObject(data, key);
-
-        if (!authorizedValue && !unauthorize) {
-            data = deleteKey(data, key)
-        } else if (typeof dataValue == "string") {
-            if (unauthorize && authorizedValue.includes(dataValue))
-                data = deleteKey(data, key)
-            else {
-                if (!authorizedValue.includes(dataValue))
-                    data = deleteKey(data, key)
-                else
-                    keyStatus = true
-            }
-        } else if (Array.isArray(dataValue)) {
-            for (let i = 0; i < dataValue.length; i++) {
-                keyStatus = await checkArray(authorized, data, `${key}[${i}]`, unauthorize)
-            }
-        } else if (typeof dataValue === "object") {
-            let checkKeys = true
-            if (dataValue['_id']) {
-                if (authorized.object.includes(dataValue['_id']))
-                    checkKeys = true
-            }
-            if (checkKeys) {
-                if (authorizedValue['*'] || authorizedValue['*'] == '')
-                    keyStatus = true
-                else
-                    for (const k of Object.keys(dataValue)) {
-                        keyStatus = await checkArray(authorized, data, `${key}.${k}`, unauthorize)
-                    }
-            }
-        }
-
-        return keyStatus
-    }
-
-    async function checkFilter(authorized, data, apikey, unauthorize) {
-        if (data.object.$filter && data.object.$filter.query) {
-            let key
-            if (data.object.$filter.type == 'object')
-                key = '_id'
-            else if (data.object.$filter.type == 'array')
-                key = 'name'
-            if (key) {
-                for (let value of authorized[apikey]) {
-                    if (value[key])
-                        value = value[key]
-                    if (unauthorize)
-                        data.object.$filter.query.push({ key, value, operator: '$ne', logicalOperator: 'or' })
-                    else
-                        data.object.$filter.query.push({ key, value, operator: '$eq', logicalOperator: 'or' })
+            if (Array.isArray(authorized)) {
+                for (let i = 0; i < authorized.length; i++) {
+                    status = await checkMethodMatch(data, authorized[i], newmatch)
                 }
-                if (!unauthorize)
-                    return true
+            } else if (typeof authorized === 'object') {
+                let keys = Object.keys(authorized);
+
+                if (data.method === 'object.read' && data.array.includes('organizations'))
+                    console.log('test')
+
+                for (const key of keys) {
+                    if (key.includes('$'))
+                        status = await checkMethodOperators(data, key, authorized[key])
+                    else if (newmatch && (authorized[newmatch] || authorized['*'])) {
+                        status = await checkMethodMatch(data, authorized[newmatch] || authorized['*'], newmatch)
+                        if (status === false)
+                            return false
+                    } else {
+                        // TODO: check if key contains query operators and query data to return true | false
+                        return true
+                    }
+                }
             }
+            return status
         }
+    }
+
+    async function checkMethodOperators(data, key, value) {
+        if (value === 'this.userId' && data.socket)
+            value = data.socket.user_id
+        if (['$storage', '$database', '$array', '$index', '$object'].includes(key))
+            console.log('key is a crud type operator', key)
+        else {
+            let keys = key.split('.')
+            let query = { key: keys[1], value, operator: keys[0] }
+            if (!data.$filter)
+                data.$filter = { query: [query] }
+            else if (!data.$filter.query)
+                data.$filter.query = [query]
+            else
+                data.$filter.query.push(query)
+
+            console.log('key is a query operator', key)
+        }
+        return true
     }
 
     function deleteKey(data, path) {
