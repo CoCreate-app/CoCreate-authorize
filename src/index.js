@@ -193,10 +193,9 @@
 
         let status = await checkMethod(data, authorized.actions, data.method)
 
-        console.log(data.method, status)
+        // console.log(data.method, status)
 
         if (!status) {
-            // if (data.method === 'object.read' && data.array.includes('organizations'))
             return false
         }
 
@@ -248,19 +247,11 @@
             } else if (typeof authorized === 'object') {
                 let keys = Object.keys(authorized);
 
-                if (data.method === 'object.read' && data.array.includes('organizations'))
-                    console.log('test')
-
                 for (const key of keys) {
                     if (key.includes('$'))
                         status = await checkMethodOperators(data, key, authorized[key])
                     else if (newmatch && (authorized[newmatch] || authorized['*'])) {
                         status = await checkMethodMatch(data, authorized[newmatch] || authorized['*'], newmatch)
-                        if (status === false)
-                            return false
-                    } else {
-                        // TODO: check if key contains query operators and query data to return true | false
-                        return true
                     }
                 }
             }
@@ -271,9 +262,10 @@
     async function checkMethodOperators(data, key, value) {
         if (value === 'this.userId' && data.socket)
             value = data.socket.user_id
-        if (['$storage', '$database', '$array', '$index', '$object'].includes(key))
-            console.log('key is a crud type operator', key)
-        else {
+        if (['$storage', '$database', '$array', '$index', '$object', '$key'].includes(key)) {
+            // TODO: sanitize data by removing items user does not have access to. 
+            // console.log('key is a crud type operator', key)
+        } else {
             let keys = key.split('.')
             let query = { key: keys[1], value, operator: keys[0] }
             if (!data.$filter)
@@ -283,7 +275,7 @@
             else
                 data.$filter.query.push(query)
 
-            console.log('key is a query operator', key)
+            // console.log('key is a query operator', key)
         }
         return true
     }
