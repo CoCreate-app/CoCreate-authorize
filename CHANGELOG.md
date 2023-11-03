@@ -1,3 +1,20 @@
+# [1.8.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.6...v1.8.0) (2023-11-03)
+
+
+### Bug Fixes
+
+* if organization_id does not exist error ([5dbdd8f](https://github.com/CoCreate-app/CoCreate-authorize/commit/5dbdd8f285418618575efc8a1e525dbde6ea81a1))
+* improve authorization promise handling ([df00618](https://github.com/CoCreate-app/CoCreate-authorize/commit/df00618c03c129b20abb5878f73d6522dbec5401))
+* Improve conditions ([689e6fa](https://github.com/CoCreate-app/CoCreate-authorize/commit/689e6fa95d8378f2d7bed22c1e2a2f29bc5c7be0))
+* request.request param removed ([06a656d](https://github.com/CoCreate-app/CoCreate-authorize/commit/06a656d8b2a354ff473e8de1cfa5b44abc81bd89))
+* update dependencies to the lates versions ([0a19463](https://github.com/CoCreate-app/CoCreate-authorize/commit/0a1946353c787a5dee1f54324e1fb2290c4b7a0f))
+
+
+### Features
+
+* check if authoriztion keys has a query operator and apply query ([e2dfa5c](https://github.com/CoCreate-app/CoCreate-authorize/commit/e2dfa5c02bbb537454e2f5d9a9b07444dd60c3a6))
+* support adding querires for  crud methods ([9b68d24](https://github.com/CoCreate-app/CoCreate-authorize/commit/9b68d244982fe08f680043cd7f1a1b06cc6be301))
+
 ## [1.7.6](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.5...v1.7.6) (2023-10-26)
 
 
