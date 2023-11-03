@@ -262,11 +262,10 @@
     async function checkMethodOperators(data, key, value) {
         if (value === 'this.userId' && data.socket)
             value = data.socket.user_id
-        if (['$storage', '$database', '$array', '$index', '$object', '$key'].includes(key)) {
-            // TODO: sanitize data by removing items user does not have access to. 
-            // console.log('key is a crud type operator', key)
-        } else {
-            let keys = key.split('.')
+
+        let keys = key.split('.')
+        if (['$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$in', '$nin', '$or', '$and', '$not', '$nor', '$exists', '$type', '$mod', '$regex', '$text', '$where', '$all', '$elemMatch', '$size'].includes(keys[0])) {
+            // let keys = key.split('.')
             let query = { key: keys[1], value, operator: keys[0] }
             if (!data.$filter)
                 data.$filter = { query: [query] }
@@ -275,10 +274,35 @@
             else
                 data.$filter.query.push(query)
 
-            // console.log('key is a query operator', key)
+        } else {
+            // TODO: sanitize data by removing items user does not have access to.
+            // console.log('key is a query operator', key)            
         }
         return true
     }
+
+    async function checkFilter(authorized, data, apikey, unauthorize) {
+        if (data.object.$filter && data.object.$filter.query) {
+            let key
+            if (data.object.$filter.type == 'object')
+                key = '_id'
+            else if (data.object.$filter.type == 'array')
+                key = 'name'
+            if (key) {
+                for (let value of authorized[apikey]) {
+                    if (value[key])
+                        value = value[key]
+                    if (unauthorize)
+                        data.object.$filter.query.push({ key, value, operator: '$ne', logicalOperator: 'or' })
+                    else
+                        data.object.$filter.query.push({ key, value, operator: '$eq', logicalOperator: 'or' })
+                }
+                if (!unauthorize)
+                    return true
+            }
+        }
+    }
+
 
     function deleteKey(data, path) {
         if (!data || !path) return
