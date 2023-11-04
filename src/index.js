@@ -18,11 +18,11 @@
     const organizations = {}
 
     if (isBrowser) {
-        crud.listen('update.object', function (data) {
+        crud.listen('object.update', function (data) {
             updateAuthorization(data)
         });
 
-        crud.listen('delete.object', function (data) {
+        crud.listen('object.delete', function (data) {
             deleteAuthorization(data)
         });
     } else {
