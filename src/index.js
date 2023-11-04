@@ -190,6 +190,8 @@
         }
         if (authorized.admin === 'true' || authorized.admin === true)
             return true;
+        if (authorized.actions)
+            return { error: "Authorization does not have any actions defined" };
 
         let status = await checkMethod(data, authorized.actions, data.method)
 
