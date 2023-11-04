@@ -190,7 +190,7 @@
         }
         if (authorized.admin === 'true' || authorized.admin === true)
             return true;
-        if (authorized.actions)
+        if (!authorized.actions)
             return { error: "Authorization does not have any actions defined" };
 
         let status = await checkMethod(data, authorized.actions, data.method)
@@ -240,7 +240,7 @@
             return !!authorized
         } else {
             let status = false
-            let newmatch = data.method.replace(match, '')
+            let newmatch = data.method.replace(match + '.', '')
 
             if (Array.isArray(authorized)) {
                 for (let i = 0; i < authorized.length; i++) {
