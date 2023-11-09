@@ -1,3 +1,14 @@
+## [1.8.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.8.0...v1.8.1) (2023-11-09)
+
+
+### Bug Fixes
+
+* meta name typo ([a21a4b5](https://github.com/CoCreate-app/CoCreate-authorize/commit/a21a4b5a8b92d17dabb9d60274526e43235ef9d5))
+* return error if no authorization.actions ([61cff63](https://github.com/CoCreate-app/CoCreate-authorize/commit/61cff637a565305032fc4356b24b039e428d7b6d))
+* typos ([48eecb4](https://github.com/CoCreate-app/CoCreate-authorize/commit/48eecb43925bf0b70d7daabb5e82a5d7cd5e305f))
+* update crud methods ([c416245](https://github.com/CoCreate-app/CoCreate-authorize/commit/c41624522c9688321b5cdb7c2c401b38cc057ead))
+* update host ([a86a448](https://github.com/CoCreate-app/CoCreate-authorize/commit/a86a4489d6fbc18c3989735db1edf4fb0125fb15))
+
 # [1.8.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.7.6...v1.8.0) (2023-11-03)
 
 
