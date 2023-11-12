@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.8.1...v1.8.2) (2023-11-12)
+
+
+### Bug Fixes
+
+* bump dependencies for latest features ([696dd55](https://github.com/CoCreate-app/CoCreate-authorize/commit/696dd55c610aff4b29d378ecf91b20e824392322))
+
 ## [1.8.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.8.0...v1.8.1) (2023-11-09)
 
 
