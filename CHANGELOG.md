@@ -1,3 +1,15 @@
+# [1.11.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.10.0...v1.11.0) (2023-11-25)
+
+
+### Bug Fixes
+
+* update licensing details ([df383e4](https://github.com/CoCreate-app/CoCreate-authorize/commit/df383e451fdab62b3fbbe45a5376096e4e7a76e1))
+
+
+### Features
+
+* upgrade dependencies for latest features and fixes ([6812dcc](https://github.com/CoCreate-app/CoCreate-authorize/commit/6812dcc18d049986bd80b818d8ccb9ff00926733))
+
 # [1.10.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.9.0...v1.10.0) (2023-11-25)
 
 
