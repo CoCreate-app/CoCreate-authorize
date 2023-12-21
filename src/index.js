@@ -109,7 +109,9 @@
                     let roles = await crud.send(request)
                     roles = roles.object
 
-                    authorization = await createAuthorization(authorization, roles)
+                    for (let role of roles) {
+                        authorization = dotNotationToObject(authorization, role)
+                    }
                 }
                 return authorization;
             } else
@@ -119,41 +121,6 @@
             return { error };
         }
 
-    }
-
-    async function createAuthorization(authorization, roles) {
-        roles.map(role => {
-            for (const roleKey in role) {
-                if (!["_id", "type", "name", "organization_id"].includes(roleKey)) {
-                    if (!authorization[roleKey]) {
-                        authorization[roleKey] = role[roleKey]
-                    } else {
-                        if (Array.isArray(role[roleKey])) {
-                            for (let item of role[roleKey]) {
-                                if (!authorization[roleKey].includes(item))
-                                    authorization[roleKey].push(item)
-                            }
-                        }
-                        else if (typeof role[roleKey] == 'object') {
-                            for (const c of Object.keys(role[roleKey])) {
-                                if (!authorization[roleKey][c]) {
-                                    authorization[roleKey][c] = role[roleKey][c]
-                                } else {
-                                    if (typeof role[roleKey][c] == 'object') {
-                                        authorization[roleKey][c] = { ...authorization[roleKey][c], ...role[roleKey][c] }
-                                    } else {
-                                        authorization[roleKey][c] = role[roleKey][c]
-                                    }
-                                }
-                            }
-                        } else {
-                            authorization[roleKey] = role[roleKey]
-                        }
-                    }
-                }
-            }
-        })
-        return authorization;
     }
 
     async function check(data, user_id) {
@@ -277,6 +244,17 @@
                 data.$filter.query.push(query)
 
         } else {
+            if (key === '$array' && value === 'questions') {
+                if (typeof data.array === 'string') {
+                    if (typeof value === 'string') {
+                        return data.array === value
+                    } else if (Array.isArray(value)) {
+                        return value.includes(data.array)
+                    }
+                } else if (Array.isArray(data.array)) {
+
+                }
+            }
             // TODO: sanitize data by removing items user does not have access to.
             // console.log('key is a query operator', key)            
         }
