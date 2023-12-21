@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.11.0...v1.12.0) (2023-12-21)
+
+
+### Features
+
+* use dotNotation for merging keys ([ac1177a](https://github.com/CoCreate-app/CoCreate-authorize/commit/ac1177a7445060ab679a3922bbfe544c11d807dc))
+
 # [1.11.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.10.0...v1.11.0) (2023-11-25)
 
 
