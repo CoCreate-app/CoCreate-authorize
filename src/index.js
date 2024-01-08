@@ -37,7 +37,7 @@
         if (array === 'keys' && object) {
             let authorization = object[0]
             if (authorization && authorization.key && organizations[organization_id] && organizations[organization_id][authorization.key]) {
-                let newAuthorization = await readAuthorization(authorization.key, organization_id)
+                let newAuthorization = await readAuthorization(authorization.key, data)
                 organizations[organization_id][authorization.key] = newAuthorization
             }
         }
@@ -54,24 +54,27 @@
         }
     }
 
-    async function getAuthorization(key, organization_id) {
+    async function getAuthorization(key, data) {
+        let organization_id = data.organization_id
         if (!organizations[organization_id])
             organizations[organization_id] = {}
 
         if (!organizations[organization_id][key])
-            organizations[organization_id][key] = readAuthorization(key, organization_id);
+            organizations[organization_id][key] = readAuthorization(key, data);
 
         organizations[organization_id][key] = await organizations[organization_id][key]
         return organizations[organization_id][key]
     }
 
-    async function readAuthorization(key, organization_id) {
+    async function readAuthorization(key, data) {
         try {
+            let organization_id = data.organization_id
             if (!organization_id)
                 return { error: 'An organization_id is required' };
 
             let request = {
                 method: 'object.read',
+                host: data.host,
                 database: organization_id,
                 array: 'keys',
                 organization_id,
@@ -146,7 +149,7 @@
         if (!data.method)
             return { error: 'method is required' };
 
-        let authorized = await getAuthorization(key, data.organization_id)
+        let authorized = await getAuthorization(key, data)
         if (!authorized || authorized.error)
             return authorized
         if (authorized.organization_id !== data.organization_id)
