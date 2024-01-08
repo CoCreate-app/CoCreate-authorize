@@ -1,3 +1,15 @@
+# [1.13.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.12.0...v1.13.0) (2024-01-08)
+
+
+### Bug Fixes
+
+* applied host to define environment/branch ([56ff08a](https://github.com/CoCreate-app/CoCreate-authorize/commit/56ff08a0929003b37658ab394c74bf1e429cecd5))
+
+
+### Features
+
+* bumped CoCreate dependencies to their latest versions ([641c52b](https://github.com/CoCreate-app/CoCreate-authorize/commit/641c52b6af630d7164cc9e720d00e4e40d7e3d11))
+
 # [1.12.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.11.0...v1.12.0) (2023-12-21)
 
 
