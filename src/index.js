@@ -79,14 +79,14 @@
                 array: 'keys',
                 organization_id,
                 $filter: {
-                    query: []
+                    query: {}
                 }
             }
 
             if (key)
-                request.$filter.query.push({ key: 'key', value: key, operator: '$eq' })
+                request.$filter.query.key = key
             else
-                request.$filter.query.push({ key: 'default', value: true, operator: '$eq' })
+                request.$filter.query.default = true
 
 
             let authorization = await crud.send(request)
@@ -235,16 +235,15 @@
         if (value === 'this.userId' && data.socket)
             value = data.socket.user_id
 
+        // TODO: support our standard query system
         let keys = key.split('.')
         if (['$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$in', '$nin', '$or', '$and', '$not', '$nor', '$exists', '$type', '$mod', '$regex', '$text', '$where', '$all', '$elemMatch', '$size'].includes(keys[0])) {
-            // let keys = key.split('.')
-            let query = { key: keys[1], value, operator: keys[0] }
             if (!data.$filter)
-                data.$filter = { query: [query] }
+                data.$filter = { query: {} }
             else if (!data.$filter.query)
-                data.$filter.query = [query]
-            else
-                data.$filter.query.push(query)
+                data.$filter.query = {}
+
+            data.$filter.query[keys[1]] = { [keys[0]]: value }
 
         } else {
             if (key === '$array' && value === 'questions') {
@@ -275,10 +274,12 @@
                 for (let value of authorized[apikey]) {
                     if (value[key])
                         value = value[key]
+                    if (!data.object.$filter.query.$or)
+                        data.object.$filter.query.$or = []
                     if (unauthorize)
-                        data.object.$filter.query.push({ key, value, operator: '$ne', logicalOperator: 'or' })
+                        data.object.$filter.query.$or.push({ [key]: { $ne: value } })
                     else
-                        data.object.$filter.query.push({ key, value, operator: '$eq', logicalOperator: 'or' })
+                        data.object.$filter.query.$or.push({ [key]: value })
                 }
                 if (!unauthorize)
                     return true
