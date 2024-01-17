@@ -1,3 +1,11 @@
+## [1.13.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.0...v1.13.1) (2024-01-17)
+
+
+### Bug Fixes
+
+* get user from socket or data ([1e3a821](https://github.com/CoCreate-app/CoCreate-authorize/commit/1e3a82119e774c9714324e8780e453f43eecb9c4))
+* update to support new query system ([0ddfeca](https://github.com/CoCreate-app/CoCreate-authorize/commit/0ddfeca394ae44b1c56499df38df0b96c0b15396))
+
 # [1.13.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.12.0...v1.13.0) (2024-01-08)
 
 
