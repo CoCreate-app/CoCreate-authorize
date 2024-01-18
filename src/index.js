@@ -232,7 +232,7 @@
     }
 
     async function checkMethodOperators(data, key, value) {
-        if (value === 'this.userId' && data.socket)
+        if (value === '$user_Id' && data.socket)
             value = data.socket.user_id || data.user_id
 
         // TODO: support our standard query system
