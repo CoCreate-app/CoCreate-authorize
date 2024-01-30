@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.1...v1.13.2) (2024-01-30)
+
+
+### Bug Fixes
+
+* replaced this.user with $user_id ([4b3c672](https://github.com/CoCreate-app/CoCreate-authorize/commit/4b3c672fce83d96729900e2be08c93d4c36c97f8))
+
 ## [1.13.1](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.0...v1.13.1) (2024-01-17)
 
 
