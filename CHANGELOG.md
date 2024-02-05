@@ -1,3 +1,10 @@
+## [1.13.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.2...v1.13.3) (2024-02-05)
+
+
+### Bug Fixes
+
+* Removed https://cdn.cocreate.app/latest/CoCreate.min.css ([43cb53f](https://github.com/CoCreate-app/CoCreate-authorize/commit/43cb53f2c63bf2768fe2bb013cb2001bc0972194))
+
 ## [1.13.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.1...v1.13.2) (2024-01-30)
 
 
