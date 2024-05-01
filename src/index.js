@@ -165,7 +165,7 @@
 
         let status = await checkMethod(data, authorized.actions, data.method)
 
-        // console.log(data.method, status)
+        // console.log(data.method, data.array, status)
 
         if (!status) {
             return false
@@ -217,50 +217,117 @@
                     status = await checkMethodMatch(data, authorized[i], newmatch)
                 }
             } else if (typeof authorized === 'object') {
-                let keys = Object.keys(authorized);
-
-                for (const key of keys) {
-                    if (key.includes('$'))
-                        status = await checkMethodOperators(data, key, authorized[key])
-                    else if (newmatch && (authorized[newmatch] || authorized['*'])) {
-                        status = await checkMethodMatch(data, authorized[newmatch] || authorized['*'], newmatch)
+                for (const key of Object.keys(authorized)) {
+                    if (key.includes('$')) {
+                        if (['$storage', '$database', '$array', '$index'].includes(key)) {
+                            let opStatus = await checkMethodOperators(data, key, authorized[key])
+                            if (opStatus === true || opStatus === false)
+                                status = opStatus
+                        } else {
+                            let isFilter = applyFilter(data, authorized[key], key)
+                            console.log('isFIlter', isFilter)
+                        }
                     }
                 }
             }
+            if (newmatch) {
+                if (!status && authorized[newmatch]) {
+                    status = await checkMethodMatch(data, authorized[newmatch], newmatch)
+                }
+                if (!status && authorized['*']) {
+                    status = await checkMethodMatch(data, authorized['*'], newmatch)
+                }
+            }
+
             return status
         }
     }
 
-    async function checkMethodOperators(data, key, value) {
-        if (value === '$user_Id' && data.socket)
-            value = data.socket.user_id || data.user_id
+    async function checkMethodOperators(data, key, authorization) {
+        try {
+            // Adjust authorization if it's based on a dynamic user ID from sockets
+            if (authorization === '$user_id' && data.socket) {
+                authorization = data.socket.user_id || data.user_id;
+            }
 
-        // TODO: support our standard query system
-        let keys = key.split('.')
-        if (['$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$in', '$nin', '$or', '$and', '$not', '$nor', '$exists', '$type', '$mod', '$regex', '$text', '$where', '$all', '$elemMatch', '$size'].includes(keys[0])) {
+            if (key.startsWith('$')) {
+                let type = key.substring(1);
+
+                if (!data[type]) {
+                    return undefined;
+                }
+
+                if (typeof data[type] === 'string') {
+                    return checkAuthorizationData(data, authorization, data[type])
+                } else if (Array.isArray(data[type])) {
+                    if (!data[type].length)
+                        return undefined
+                    // ToDo: Current stratergy checks if all items match else false will be returned 
+                    let allAuthorized = true;
+                    for (let i = 0; i < data[type].length; i++) {
+                        const itemData = typeof data[type][i] === 'object' ? data[type][i].name : data[type][i];
+                        const authResult = checkAuthorizationData(data, authorization, itemData);
+                        if (authResult === false) {
+                            return false;  // Return false as soon as one item is unauthorized
+                        } else if (authResult === undefined) {
+                            allAuthorized = undefined
+                        }
+                    }
+                    return allAuthorized;
+                } else if (typeof data[type] === 'object') {
+                    return checkAuthorizationData(data, authorization, data[type].name)
+                }
+            }
+            return undefined;
+        } catch (e) {
+            console.log(e);
+            return undefined;
+        }
+    }
+
+    function checkAuthorizationData(data, authorization, key) {
+        if (typeof authorization === 'string') {
+            if (key === authorization)
+                return true
+            else
+                return undefined
+        } else if (Array.isArray(authorization)) {
+            if (authorization.includes(key))
+                return true
+            else
+                return undefined
+        } else if (typeof authorization === 'object') {
+            if (typeof authorization[key] === 'object') {
+                for (const queryKey of Object.keys(authorization[key])) {
+                    return applyFilter(data, authorization[key], queryKey)
+                }
+            } else if (authorization[key] === false || authorization[key] === 'false')
+                return false
+            else if (authorization[key])
+                return true
+            else
+                return undefined
+        }
+    }
+
+    function applyFilter(data, authorization, authorizationKey) {
+        let keyParts = authorizationKey.split('.');
+        let operator = keyParts.pop();
+        let key = keyParts.join('.');
+        if (['$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$in', '$nin', '$or', '$and', '$not', '$nor', '$exists', '$type', '$mod', '$regex', '$text', '$where', '$all', '$elemMatch', '$size'].includes(operator)) {
             if (!data.$filter)
                 data.$filter = { query: {} }
             else if (!data.$filter.query)
                 data.$filter.query = {}
 
-            data.$filter.query[keys[1]] = { [keys[0]]: value }
-
-        } else {
-            if (key === '$array' && value === 'questions') {
-                if (typeof data.array === 'string') {
-                    if (typeof value === 'string') {
-                        return data.array === value
-                    } else if (Array.isArray(value)) {
-                        return value.includes(data.array)
-                    }
-                } else if (Array.isArray(data.array)) {
-
-                }
+            if (authorization[authorizationKey] === '$user_id' && data.socket) {
+                authorization[authorizationKey] = data.socket.user_id || data.user_id;
             }
-            // TODO: sanitize data by removing items user does not have access to.
-            // console.log('key is a query operator', key)            
+
+            data.$filter.query[key] = { [operator]: authorization[authorizationKey] }
+
+            return true
         }
-        return true
     }
 
     async function checkFilter(authorized, data, apikey, unauthorize) {
@@ -286,7 +353,6 @@
             }
         }
     }
-
 
     function deleteKey(data, path) {
         if (!data || !path) return
