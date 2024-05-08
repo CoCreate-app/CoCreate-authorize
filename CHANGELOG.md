@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.3...v1.14.0) (2024-05-08)
+
+
+### Features
+
+* **permissions:** Add new operators '$storage', '$database', '$array', '$index' ([cdbc51f](https://github.com/CoCreate-app/CoCreate-authorize/commit/cdbc51f095b93df079f73f837fad21870f13882c))
+
 ## [1.13.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.13.2...v1.13.3) (2024-02-05)
 
 
