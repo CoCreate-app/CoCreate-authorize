@@ -1,3 +1,10 @@
+## [1.14.3](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.2...v1.14.3) (2024-06-23)
+
+
+### Bug Fixes
+
+* lock file ([6f4c338](https://github.com/CoCreate-app/CoCreate-authorize/commit/6f4c33894b7bd382346df066bdb3d7a6da962187))
+
 ## [1.14.2](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.1...v1.14.2) (2024-06-23)
 
 
