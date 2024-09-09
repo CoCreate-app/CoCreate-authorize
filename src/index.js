@@ -26,7 +26,7 @@
             deleteAuthorization(data)
         });
     } else {
-        process.on('changed-object', async (data) => {
+        process.on('crud-event', async (data) => {
             updateAuthorization(data)
         })
     }
