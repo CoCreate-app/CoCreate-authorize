@@ -1,3 +1,10 @@
+## [1.14.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.4...v1.14.5) (2024-09-21)
+
+
+### Bug Fixes
+
+* crud-event ([0b65dd4](https://github.com/CoCreate-app/CoCreate-authorize/commit/0b65dd4f2dfff0eac56723e97910bc6ef742796d))
+
 ## [1.14.4](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.3...v1.14.4) (2024-06-23)
 
 
