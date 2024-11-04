@@ -1,3 +1,15 @@
+# [1.15.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.5...v1.15.0) (2024-11-04)
+
+
+### Bug Fixes
+
+* prettier.config options ([55eddb4](https://github.com/CoCreate-app/CoCreate-authorize/commit/55eddb46c223e01f73460f395bca92d94826a84c))
+
+
+### Features
+
+* add prettier.config.js and format files ([2d4c894](https://github.com/CoCreate-app/CoCreate-authorize/commit/2d4c894170d1884da8bbba1d2f3ef551ff2abc01))
+
 ## [1.14.5](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.4...v1.14.5) (2024-09-21)
 
 
