@@ -447,7 +447,7 @@
 					}
 				} else if (typeof authorized === "object") {
 					for (const key of Object.keys(authorized)) {
-						if (key.includes("$")) {
+						 if (key.includes("$")) {
 							if (
 								[
 									"$storage",
@@ -463,6 +463,11 @@
 								);
 								if (opStatus === true || opStatus === false)
 									status = opStatus;
+							} else if (key === "$keys"){
+								let type = data.method.split(".")[0];
+								if (data[type]) {
+									rawKeys.push(authorized[key]); // Collect raw authorization keys
+								}
 							} else {
 								let isFilter = applyFilter(
 									data,
@@ -471,12 +476,6 @@
 								);
 								console.log("isFilter", isFilter);
 							}
-						} else {
-							let type = data.method.split(".")[0];
-							if (data[type]) {
-								rawKeys.push(authorized[key]); // Collect raw authorization keys
-							}
-							status = true;
 						}
 					}
 				}
@@ -493,6 +492,7 @@
 							inclusion,
 							exclusion
 						);
+						status = true;
 					}
 				}
 
