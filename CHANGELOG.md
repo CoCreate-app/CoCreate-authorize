@@ -1,3 +1,16 @@
+# [1.16.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.15.0...v1.16.0) (2024-12-09)
+
+
+### Bug Fixes
+
+* $key condition placement ([5dea39f](https://github.com/CoCreate-app/CoCreate-authorize/commit/5dea39fb9ae8f2c0deb17295be4df32e17c2e3ea))
+* handle authorization string ([6e5f25b](https://github.com/CoCreate-app/CoCreate-authorize/commit/6e5f25b96734f4b131906f3dc34b011852f18cfc))
+
+
+### Features
+
+* key level permission will sanitize, include and exclude data being returned ([f38232f](https://github.com/CoCreate-app/CoCreate-authorize/commit/f38232f5995e2c29e95002efb075a6ff053d05f0))
+
 # [1.15.0](https://github.com/CoCreate-app/CoCreate-authorize/compare/v1.14.5...v1.15.0) (2024-11-04)
 
 
