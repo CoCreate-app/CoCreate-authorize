@@ -447,7 +447,7 @@
 					}
 				} else if (typeof authorized === "object") {
 					for (const key of Object.keys(authorized)) {
-						 if (key.includes("$")) {
+						if (key.includes("$")) {
 							if (
 								[
 									"$storage",
@@ -463,7 +463,7 @@
 								);
 								if (opStatus === true || opStatus === false)
 									status = opStatus;
-							} else if (key === "$keys"){
+							} else if (key === "$keys") {
 								let type = data.method.split(".")[0];
 								if (data[type]) {
 									rawKeys.push(authorized[key]); // Collect raw authorization keys
@@ -696,9 +696,14 @@
 						data.socket.user_id || data.user_id;
 				}
 
-				data.$filter.query[key] = {
-					[operator]: authorization[authorizationKey]
-				};
+				if (typeof authorization === "string")
+					data.$filter.query[key] = {
+						[operator]: authorization
+					};
+				else
+					data.$filter.query[key] = {
+						[operator]: authorization[authorizationKey]
+					};
 
 				return true;
 			}
